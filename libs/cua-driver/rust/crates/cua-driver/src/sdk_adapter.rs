@@ -97,6 +97,13 @@ impl SdkAdapter {
             .map_err(|error| error.to_string())
     }
 
+    pub async fn revoke_all_sessions(&self) -> Result<usize, String> {
+        self.driver
+            .revoke_all_host_sessions()
+            .await
+            .map_err(|error| error.to_string())
+    }
+
     pub async fn shutdown(&self) -> Result<(), String> {
         self.driver
             .shutdown()
