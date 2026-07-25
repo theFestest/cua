@@ -374,6 +374,7 @@ pub fn advertised_risk_for(tool: &str) -> RiskAssessment {
         // External/file side effects or generic compound action surfaces.
         "get_desktop_state"
         | "get_window_state"
+        | "get_workspace_state"
         | "install_ffmpeg"
         | "page"
         | "browser_dialog"
@@ -392,6 +393,7 @@ pub fn advertised_risk_for(tool: &str) -> RiskAssessment {
                 | "page"
                 | "get_desktop_state"
                 | "get_window_state"
+                | "get_workspace_state"
         ),
     }
 }

@@ -511,6 +511,14 @@ impl ToolRegistry {
             return permission_denied_result(error.to_string());
         }
 
+        if let Err(error) = crate::workspace::validate_operation_target(resolved_name, &args).await
+        {
+            return ToolResult::error(error.to_string()).with_structured(serde_json::json!({
+                "code": error.code(),
+                "workspace_id": crate::workspace::resolve_workspace_id(&args).ok().flatten(),
+            }));
+        }
+
         // Reject modality violations before reserving a recording turn. A
         // rejected action has no before/after evidence and must not leave a
         // pending recorder entry behind.
