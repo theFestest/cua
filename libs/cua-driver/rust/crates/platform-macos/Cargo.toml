@@ -60,6 +60,10 @@ objc2-quartz-core = { version = "0.2", features = ["CALayer"] }
 # Screen Recording TCC prompt that subprocess capture would otherwise trip.
 screencapturekit = { version = "6", features = ["macos_15_0"] }
 
+# Apple Vision OCR, isolated in its own crate so its objc2 0.6 requirement
+# does not meet this crate's objc2 0.5 pin.
+cua-driver-ocr = { path = "../cua-driver-ocr" }
+
 # tiny-skia for cursor rendering
 tiny-skia = { version = "0.11", default-features = false, features = ["std"] }
 

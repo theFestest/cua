@@ -29,6 +29,7 @@ mod get_desktop_state;
 pub(crate) mod get_screen_size;
 mod health_report;
 mod move_cursor;
+mod ocr;
 mod page;
 mod set_config;
 mod type_text_chars;
@@ -602,6 +603,7 @@ pub fn register_all(registry: &mut ToolRegistry, compat: bool) {
     registry.register(Box::new(zoom::ZoomTool {
         state: state.clone(),
     }));
+    registry.register(Box::new(ocr::OcrTool));
     // `type_text_chars` is intentionally NOT registered — Swift treats it as
     // a deprecated alias for `type_text` resolved at invoke time in
     // mcp-server's `ToolRegistry::invoke`. Keeping it out of the registry

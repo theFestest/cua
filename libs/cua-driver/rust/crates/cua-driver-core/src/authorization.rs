@@ -354,6 +354,7 @@ pub fn advertised_risk_for(tool: &str) -> RiskAssessment {
         // Surfaces that can reveal or control sensitive local/authenticated
         // state. Most remain metadata-only until their resource adapters ship.
         "zoom"
+        | "ocr"
         | "get_accessibility_tree"
         | "set_config"
         | "escalate_session"

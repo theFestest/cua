@@ -1,0 +1,29 @@
+[package]
+name = "cua-driver-ocr"
+version.workspace = true
+edition.workspace = true
+
+# This crate is deliberately isolated from `platform-macos`, which is pinned to
+# objc2 0.5 / objc2-foundation 0.2. objc2-vision requires the 0.6 / 0.3 line, and
+# two major versions of objc2 cannot exchange types. The public API here is
+# bytes-in / plain-structs-out, so no objc2 type ever crosses the boundary and
+# both versions coexist in the dependency graph.
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-foundation = { version = "0.3", default-features = false, features = [
+    "NSString",
+    "NSArray",
+    "NSEnumerator",
+    "NSData",
+    "NSDictionary",
+    "NSError",
+] }
+objc2-vision = { version = "0.3", default-features = false, features = [
+    "VNRequest",
+    "VNRequestHandler",
+    "VNRecognizeTextRequest",
+    "VNObservation",
+    "VNTypes",
+    "VNError",
+    "objc2-core-foundation",
+] }

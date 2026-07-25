@@ -8,6 +8,7 @@ members = [
     "crates/cua-driver-testkit",
     "crates/cua-driver-uia",
     "crates/cua-driver-core",
+    "crates/cua-driver-ocr",
     "crates/platform-macos",
     "crates/platform-windows",
     "crates/platform-linux",
