@@ -76,7 +76,11 @@ mod vision {
             let request = VNRecognizeTextRequest::new();
             request.setRecognitionLevel(VNRequestTextRecognitionLevel::Accurate);
             request.setUsesLanguageCorrection(true);
-            if !languages.is_empty() {
+            if languages.is_empty() {
+                // No caller hint: let Vision pick the script itself rather than
+                // silently falling back to its English-only default.
+                request.setAutomaticallyDetectsLanguage(true);
+            } else {
                 let langs: Vec<Retained<NSString>> =
                     languages.iter().map(|l| NSString::from_str(l)).collect();
                 request.setRecognitionLanguages(&NSArray::from_retained_slice(&langs));

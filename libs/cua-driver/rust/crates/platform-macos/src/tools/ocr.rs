@@ -15,7 +15,8 @@ fn def() -> &'static ToolDef {
         description: "Recognize on-screen text in one window with Apple Vision, on-device. \
             Returns each text line with a center in window-local screenshot pixels — the same \
             frame `get_window_state` returns and `click` consumes, so a recognized line is \
-            directly clickable.\n\n\
+            directly clickable. Detects the script automatically, including CJK, so leave \
+            `languages` unset unless you need to restrict recognition.\n\n\
             Use it when a surface has no usable Accessibility coverage: canvas, custom-drawn \
             views, games, or an image of text. The AX tree in `get_window_state` stays the \
             first choice — it carries roles, values, and actions that OCR cannot see."
@@ -29,7 +30,7 @@ fn def() -> &'static ToolDef {
                 "languages": {
                     "type": "array",
                     "items": { "type": "string" },
-                    "description": "BCP-47 recognition hints in priority order, e.g. [\"en-US\", \"zh-Hans\"]. Defaults to [\"en-US\"]."
+                    "description": "Optional BCP-47 hints, e.g. [\"ja\"]. Omit this to let Vision detect the script, which is the better default: a hint list restricts recognition to those languages and silently drops text in any other script."
                 }
             },
             "additionalProperties": false
@@ -63,8 +64,7 @@ impl Tool for OcrTool {
                     .map(str::to_string)
                     .collect()
             })
-            .filter(|v: &Vec<String>| !v.is_empty())
-            .unwrap_or_else(|| vec!["en-US".to_string()]);
+            .unwrap_or_default();
 
         let result = tokio::task::spawn_blocking(move || {
             let png_bytes = crate::capture::screenshot_window_bytes(window_id)?;

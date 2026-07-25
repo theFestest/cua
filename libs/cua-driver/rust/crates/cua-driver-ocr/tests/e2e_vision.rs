@@ -111,3 +111,35 @@ fn recognizes_left_to_right_order_on_one_line() {
         right.center.0
     );
 }
+
+#[test]
+#[ignore]
+fn empty_hints_detect_non_latin_script() {
+    // With no hints, Vision's own default is English-only: it returns success
+    // and silently omits every other script, which reads to a caller as "no
+    // text here" rather than as a failure. `recognize` therefore turns on
+    // automatic language detection when the caller passes no hints.
+    let (png, w, h) = render_fixture("設定を開く\nHello World\n한국어 테스트\n", "cjk");
+
+    let lines = cua_driver_ocr::recognize(&png, w, h, &[]).expect("recognize");
+    find(&lines, "設定を開く");
+    find(&lines, "한국어");
+    find(&lines, "Hello World");
+}
+
+#[test]
+#[ignore]
+fn explicit_hints_restrict_recognition() {
+    // The flip side, pinned so the trade-off stays visible: an explicit hint
+    // list is a restriction, not a preference. Latin text still reads, the
+    // unhinted script does not.
+    let (png, w, h) = render_fixture("設定を開く\nHello World\n", "restrict");
+
+    let lines = cua_driver_ocr::recognize(&png, w, h, &["en-US"]).expect("recognize");
+    find(&lines, "Hello World");
+    assert!(
+        !lines.iter().any(|l| l.text.contains("設定")),
+        "en-US-only recognition unexpectedly returned Japanese: {:?}",
+        lines.iter().map(|l| &l.text).collect::<Vec<_>>()
+    );
+}
