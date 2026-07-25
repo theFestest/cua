@@ -213,6 +213,10 @@ impl DriverRuntime {
         Ok(runtime)
     }
 
+    pub(crate) fn host_namespace(&self) -> &str {
+        self.registry.host_namespace()
+    }
+
     pub(crate) fn is_running(&self) -> bool {
         !self.shutdown.load(Ordering::Acquire)
     }
@@ -221,7 +225,7 @@ impl DriverRuntime {
         self.shutdown.store(true, Ordering::Release);
         let _drained = self.lifecycle.write().await;
         self.authorization_registry.revoke_all();
-        cua_driver_core::session::revoke_all_sessions();
+        self.registry.revoke_all_sessions().await;
         let recording = self.registry.recording.clone();
         let _ = tokio::task::spawn_blocking(move || recording.stop_owner(None)).await;
         self.ownership.release();

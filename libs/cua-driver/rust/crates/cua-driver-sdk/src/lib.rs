@@ -687,6 +687,19 @@ fn create_private_worker_for_client(
 }
 
 impl CuaDriver {
+    /// Return the session-state namespace owned by a Rust host runtime.
+    ///
+    /// Protocol adapters use this to scope transport-side lifecycle checks to
+    /// the same state as the embedded registry. Other SDK backends do not own
+    /// host session state.
+    #[doc(hidden)]
+    pub fn host_session_namespace(&self) -> Option<&str> {
+        match &self.backend {
+            DriverBackend::Embedded(runtime) => runtime.host_namespace(),
+            _ => None,
+        }
+    }
+
     /// Rust-only constructor for a transport adapter that exchanges generated
     /// Driver envelopes over an authenticated asynchronous channel.
     pub fn connect_remote(

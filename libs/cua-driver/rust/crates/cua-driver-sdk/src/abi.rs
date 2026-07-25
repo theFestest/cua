@@ -1107,6 +1107,7 @@ impl Drop for OperationGuard {
 /// statically linked into the same distribution.
 pub(crate) struct NativeAbiDriver {
     handle: Mutex<*mut ffi::Handle>,
+    host_namespace: Option<String>,
 }
 
 pub(crate) struct NativeAbiSession {
@@ -1134,15 +1135,22 @@ impl NativeAbiDriver {
         status_result(status, &mut error, "create embedded runtime")?;
         Ok(Self {
             handle: Mutex::new(handle),
+            host_namespace: None,
         })
     }
 
     pub(crate) fn create_for_host(options: RuntimeOptions) -> Result<Self, DriverError> {
         let runtime = DriverRuntime::create(options).map_err(map_runtime_create_error)?;
+        let host_namespace = runtime.host_namespace().to_owned();
         let handle = Box::into_raw(Box::new(CuaDriverHandle { runtime })).cast::<ffi::Handle>();
         Ok(Self {
             handle: Mutex::new(handle),
+            host_namespace: Some(host_namespace),
         })
+    }
+
+    pub(crate) fn host_namespace(&self) -> Option<&str> {
+        self.host_namespace.as_deref()
     }
 
     pub(crate) fn create_configured_for_host(

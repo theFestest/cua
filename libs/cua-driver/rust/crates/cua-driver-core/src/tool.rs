@@ -402,7 +402,7 @@ impl ToolRegistry {
         self.tools.insert(name, tool);
     }
 
-    pub(crate) fn host_namespace(&self) -> &str {
+    pub fn host_namespace(&self) -> &str {
         &self.host_namespace
     }
 
@@ -548,11 +548,7 @@ impl ToolRegistry {
         context: &crate::session_authorization::EffectiveAuthorizationContext,
     ) -> ToolResult {
         if let Some(manager) = self.workspace_manager.clone() {
-            crate::workspace::with_manager(
-                manager,
-                self.invoke_scoped(name, args, context),
-            )
-            .await
+            crate::workspace::with_manager(manager, self.invoke_scoped(name, args, context)).await
         } else {
             self.invoke_scoped(name, args, context).await
         }

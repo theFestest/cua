@@ -217,6 +217,21 @@ async fn invoke_daemon_tool(
     sdk: &std::sync::Arc<crate::sdk_adapter::SdkAdapter>,
     req: DaemonRequest,
 ) -> DaemonResponse {
+    if let Some(namespace) = sdk.host_session_namespace() {
+        cua_driver_core::session::with_namespace(
+            namespace.to_owned(),
+            invoke_daemon_tool_scoped(sdk, req),
+        )
+        .await
+    } else {
+        invoke_daemon_tool_scoped(sdk, req).await
+    }
+}
+
+async fn invoke_daemon_tool_scoped(
+    sdk: &std::sync::Arc<crate::sdk_adapter::SdkAdapter>,
+    req: DaemonRequest,
+) -> DaemonResponse {
     let observation_transport = daemon_observation_transport(&req);
     let direct_client_kind = req.client_kind;
     let raw_name = req.name.as_deref().unwrap_or("").to_owned();

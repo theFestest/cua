@@ -12,10 +12,12 @@ use serde_json::{json, Value};
 pub struct SdkAdapter {
     driver: Arc<CuaDriver>,
     tools_list: Value,
+    host_session_namespace: Option<String>,
 }
 
 impl SdkAdapter {
     pub async fn load(driver: Arc<CuaDriver>) -> anyhow::Result<Arc<Self>> {
+        let host_session_namespace = driver.host_session_namespace().map(str::to_owned);
         let tools_json = driver
             .list_tools_json()
             .await
@@ -25,7 +27,11 @@ impl SdkAdapter {
         if !tools_list.get("tools").is_some_and(Value::is_array) {
             anyhow::bail!("SDK tool inventory omitted tools array");
         }
-        Ok(Arc::new(Self { driver, tools_list }))
+        Ok(Arc::new(Self {
+            driver,
+            tools_list,
+            host_session_namespace,
+        }))
     }
 
     pub fn load_blocking(driver: Arc<CuaDriver>) -> anyhow::Result<Arc<Self>> {
@@ -33,6 +39,10 @@ impl SdkAdapter {
             .enable_all()
             .build()?;
         runtime.block_on(Self::load(driver))
+    }
+
+    pub fn host_session_namespace(&self) -> Option<&str> {
+        self.host_session_namespace.as_deref()
     }
 
     pub fn tools_list(&self) -> Value {
