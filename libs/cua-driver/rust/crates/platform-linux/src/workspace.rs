@@ -931,7 +931,12 @@ mod tests {
 
     #[test]
     fn terminate_owned_processes_reaps_an_already_exited_recorded_child() {
-        let child = Command::new("/bin/true").spawn().unwrap();
+        let child = Command::new(std::env::current_exe().unwrap())
+            .arg("--list")
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .unwrap();
         let pid = child.id();
         drop(child);
 
